@@ -89,12 +89,12 @@ namespace Assets
             return new Sdf(p => sdf1.ToFunc()(p) - sdf2.ToFunc()(p));
         }
 
-        public static Sdf Max(Sdf sdf1, Sdf sdf2)
+        public static Sdf Intersection(Sdf sdf1, Sdf sdf2)
         {
             return new Sdf(p => Mathf.Max(sdf1.ToFunc()(p), sdf2.ToFunc()(p)));
         }
 
-        public static Sdf Min(Sdf sdf1, Sdf sdf2)
+        public static Sdf Union(Sdf sdf1, Sdf sdf2)
         {
             return new Sdf(p => Mathf.Min(sdf1.ToFunc()(p), sdf2.ToFunc()(p)));
         }

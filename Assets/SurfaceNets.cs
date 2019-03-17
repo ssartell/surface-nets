@@ -46,14 +46,14 @@ public class SurfaceNets : MonoBehaviour
         _edges = EdgesTable();
         _intersections = IntersectionsTable(_edges);
 
-        _sdf = Sdf.Max(
-                Sdf.Perlin(this.Size / 5f), 
-                Sdf.Min(
+        _sdf = Sdf.Intersection(
+                Sdf.Union(
                     Sdf.Plane(Vector3.up)
                         .Translate(new Vector3(0, 16, 0)),
                     Sdf.Sphere()
                         .Scale(8)
-                        .Translate(Vector3.one * 16)))
+                        .Translate(Vector3.one * 16)),
+                Sdf.Perlin(this.Size / 5f))
             .ToFunc();
 
         _voxels = GenerateVoxels(_sdf);
@@ -147,7 +147,7 @@ public class SurfaceNets : MonoBehaviour
         {
             Debug.LogWarning("Exceeded max vertex count of 65536 (2^16).");
         }
-        
+
 
         mesh.vertices = _vertices.ToArray();
         mesh.triangles = _triangles.ToArray();
@@ -176,7 +176,7 @@ public class SurfaceNets : MonoBehaviour
 
                     if (cornerMask == 0 || cornerMask == 0xff) continue; // all corners are inside or outside the surface
 
-                    var edgeMask = _intersections[cornerMask];                    
+                    var edgeMask = _intersections[cornerMask];
 
                     var vertex = Vector3.zero;
                     var crossings = 0;
@@ -207,7 +207,7 @@ public class SurfaceNets : MonoBehaviour
                         EdgeMask = _intersections[cornerMask],
                         VertexPosition = vertex,
                         VertexIndex = vertexIndex,
-                        Value = voxels[x,y,z].Value
+                        Value = voxels[x, y, z].Value
                     };
 
                     cubes[x, y, z] = cube;
