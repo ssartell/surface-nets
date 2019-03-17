@@ -46,7 +46,16 @@ public class DualMesh : MonoBehaviour
         _edges = EdgesTable();
         _intersections = IntersectionsTable(_edges);
 
-        _sdf = MakeSdf();
+        _sdf = Sdf.Max(
+                Sdf.Perlin(this.Size / 5f), 
+                Sdf.Min(
+                    Sdf.Plane(Vector3.up)
+                        .Translate(new Vector3(0, 16, 0)),
+                    Sdf.Sphere()
+                        .Scale(8)
+                        .Translate(Vector3.one * 16)))
+            .ToFunc();
+
         _voxels = GenerateVoxels(_sdf);
 
         GenerateMesh();
@@ -287,19 +296,6 @@ public class DualMesh : MonoBehaviour
             new Corner(0,1,1), 	// 6
             new Corner(1,1,1)  	// 7
         };
-    }
-
-    private Func<Vector3, float> MakeSdf()
-    {
-        return Sdf.Max(
-            Sdf.Perlin(Size / 5f), 
-            Sdf.Min(
-                Sdf.Plane(Vector3.up)
-                    .Translate(new Vector3(0, 16, 0)),
-                Sdf.Sphere()
-                    .Scale(8)
-                    .Translate(Vector3.one * 16)))
-            .ToFunc();
     }
 }
 
