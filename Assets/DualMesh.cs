@@ -47,17 +47,6 @@ public class DualMesh : MonoBehaviour
         _edges = EdgesTable();
         _intersections = IntersectionsTable(_edges);
 
-
-        //var sphere = Translate(p, Vector3.one * (Size - 1) / 2f,
-        //    p0 => Scale(p0, (Size - 1) / 3f, Sphere));
-        //var perlin = Perlin3d(p, _noiseScale);
-        //Value = Translate(p, Vector3.one * (Size - 1) / 2f, p0 => Scale(p0, (Size - 1) / 2f, Sphere)),
-        //Value = Translate(p, Vector3.one * (Size - 1) / 2f, p0 => Torus(p0, new Vector2(4, 2))),
-        //Value = (float)Math.Sin(p.x) + (float)Math.Cos(p.z) - 5f + p.y
-        //Value = sphere + perlin * 10f
-        //Value = p.y - 10f + perlin * 20f
-        //Value = Mathf.Min(sphere, sphere + perlin * 20f + 1f)
-
         _sdf = MakeSdf();
         _voxels = GenerateVoxels(_sdf);
 
@@ -312,79 +301,7 @@ public class DualMesh : MonoBehaviour
                     .Scale(8)
                     .Translate(Vector3.one * 16)))
             .ToFunc();
-        //return Sdf.Sphere()
-        //    .Scale(5f)
-        //    .Translate(Vector3.one * 5f)
-        //    .ToFunc();
     }
-
-    //Func<Vector3, float> Sphere()
-    //{
-    //    return p => (float)Math.Sqrt(p.x * p.x + p.y * p.y + p.z * p.z) - 1.0f;
-    //}
-
-    //Func<Vector3, float> Torus(Vector2 t)
-    //{
-    //    return p =>
-    //    {
-    //        var q = new Vector2((new Vector2(p.x, p.z)).magnitude - t.x, p.y);
-    //        return q.magnitude - t.y;
-    //    };
-    //}
-
-    //Func<Vector3, float> Scale(float s, Func<Vector3, float> sdf)
-    //{
-    //    return p => sdf(p / s) * s;
-    //}
-
-    //Func<Vector3, float> Translate(Vector3 q, Func<Vector3, float> sdf)
-    //{
-    //    return p => sdf(p - q);
-    //}
-
-    //Func<Vector3, float> Rotate(Vector3 euler, Func<Vector3, float> sdf)
-    //{
-    //    var rotation = Quaternion.Euler(euler);
-    //    return p => sdf(rotation * p);
-    //}
-
-    //Func<Vector3, float> Add(Func<Vector3, float> sdf1, Func<Vector3, float> sdf2)
-    //{
-    //    return p => sdf1(p) + sdf2(p);
-    //}
-
-    //Func<Vector3, float> Subtract(Func<Vector3, float> sdf1, Func<Vector3, float> sdf2)
-    //{
-    //    return p => sdf1(p) - sdf2(p);
-    //}
-
-    //Func<Vector3, float> Max(Func<Vector3, float> sdf1, Func<Vector3, float> sdf2)
-    //{
-    //    return p => Mathf.Max(sdf1(p), sdf2(p));
-    //}
-
-    //Func<Vector3, float> Min(Func<Vector3, float> sdf1, Func<Vector3, float> sdf2)
-    //{
-    //    return p => Mathf.Min(sdf1(p), sdf2(p));
-    //}
-
-    //Func<Vector3, float> Perlin(float scale)
-    //{
-    //    return p =>
-    //    {
-
-    //        float ab = Mathf.PerlinNoise(p.x, p.y);
-    //        float bc = Mathf.PerlinNoise(p.y, p.z);
-    //        float ac = Mathf.PerlinNoise(p.x, p.z);
-
-    //        float ba = Mathf.PerlinNoise(p.y, p.x);
-    //        float cb = Mathf.PerlinNoise(p.z, p.y);
-    //        float ca = Mathf.PerlinNoise(p.z, p.x);
-
-    //        float abc = ab + bc + ac + ba + cb + ca;
-    //        return abc / 6f - .5f;
-    //    };
-    //}
 }
 
 public struct Cube
