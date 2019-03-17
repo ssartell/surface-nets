@@ -54,6 +54,7 @@ public class SurfaceNets : MonoBehaviour
                         .Scale(8)
                         .Translate(Vector3.one * 16)),
                 Sdf.Perlin(this.Size / 5f))
+            .Transform(transform)
             .ToFunc();
 
         _voxels = GenerateVoxels(_sdf);
@@ -64,15 +65,19 @@ public class SurfaceNets : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            _voxels = GenerateVoxels(_sdf);
-            GenerateMesh();
-        }
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            GenerateMesh();
-        }
+        Debug.Log(transform.localPosition.ToString());
+        _sdf = Sdf.Intersection(
+                Sdf.Union(
+                    Sdf.Plane(Vector3.up)
+                        .Translate(new Vector3(0, 16, 0)),
+                    Sdf.Sphere()
+                        .Scale(8)
+                        .Translate(Vector3.one * 16)),
+                Sdf.Perlin(this.Size / 5f))
+            .Transform(transform)
+            .ToFunc();
+        _voxels = GenerateVoxels(_sdf);
+        GenerateMesh();
     }
 
     private void GenerateMesh()
@@ -147,7 +152,6 @@ public class SurfaceNets : MonoBehaviour
         {
             Debug.LogWarning("Exceeded max vertex count of 65536 (2^16).");
         }
-
 
         mesh.vertices = _vertices.ToArray();
         mesh.triangles = _triangles.ToArray();

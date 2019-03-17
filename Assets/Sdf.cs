@@ -79,24 +79,29 @@ namespace Assets
             return new Sdf(p => _sdf(rotation * p));
         }
 
-        public static Sdf Add(Sdf sdf1, Sdf sdf2)
+        public Sdf Transform(Transform transform)
         {
-            return new Sdf(p => sdf1.ToFunc()(p) + sdf2.ToFunc()(p));
+            return new Sdf(p => _sdf(transform.TransformVector(p)));
         }
 
-        public static Sdf Subtract(Sdf sdf1, Sdf sdf2)
+        public Sdf Negate()
         {
-            return new Sdf(p => sdf1.ToFunc()(p) - sdf2.ToFunc()(p));
-        }
-
-        public static Sdf Intersection(Sdf sdf1, Sdf sdf2)
-        {
-            return new Sdf(p => Mathf.Max(sdf1.ToFunc()(p), sdf2.ToFunc()(p)));
+            return new Sdf(p => - _sdf(p));
         }
 
         public static Sdf Union(Sdf sdf1, Sdf sdf2)
         {
             return new Sdf(p => Mathf.Min(sdf1.ToFunc()(p), sdf2.ToFunc()(p)));
+        }
+
+        public static Sdf Subtract(Sdf sdf1, Sdf sdf2)
+        {
+            return Intersection(sdf1.Negate(), sdf2);
+        }
+
+        public static Sdf Intersection(Sdf sdf1, Sdf sdf2)
+        {
+            return new Sdf(p => Mathf.Max(sdf1.ToFunc()(p), sdf2.ToFunc()(p)));
         }
 
         public Func<Vector3, float> ToFunc()
