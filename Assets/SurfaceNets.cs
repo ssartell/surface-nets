@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Assets;
 using UnityEngine;
 
-public class DualMesh : MonoBehaviour
+public class SurfaceNets : MonoBehaviour
 {
     public int Size = 50;
     private float _isoLevel = 0.0f;
