@@ -26,14 +26,24 @@ public class SurfaceNets : MonoBehaviour
         _edges = EdgesTable();
         _intersections = IntersectionsTable(_edges);
         
+        // wormy plane
+        //_sdf = Sdf.Intersection(
+        //        Sdf.Union(
+        //            Sdf.Plane(Vector3.up)
+        //                .Translate(new Vector3(0, 16, 0)),
+        //            Sdf.Sphere()
+        //                .Scale(8)
+        //                .Translate(Vector3.one * 16)),
+        //        Sdf.Perlin(this._size / 5f))
+        //    .Transform(transform)
+        //    .ToFunc();
+
+        // wormy sphere
         _sdf = Sdf.Intersection(
-                Sdf.Union(
-                    Sdf.Plane(Vector3.up)
-                        .Translate(new Vector3(0, 16, 0)),
-                    Sdf.Sphere()
-                        .Scale(8)
-                        .Translate(Vector3.one * 16)),
-                Sdf.Perlin(this._size / 5f))
+            Sdf.Sphere()
+                .Scale(70)
+                .Translate(Vector3.one * 80),
+            Sdf.Perlin(5))
             .Transform(transform)
             .ToFunc();
 

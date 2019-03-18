@@ -5,7 +5,8 @@ using UnityEngine;
 public class ChunkManager : MonoBehaviour
 {
     public int ChunksX = 3;
-    public int ChunksY = 3;
+    public int ChunksY = 1;
+    public int ChunksZ = 3;
 
     public Material Material;
 
@@ -14,17 +15,20 @@ public class ChunkManager : MonoBehaviour
     {
         for (var x = 0; x < this.ChunksX; x++)
         {
-            for (var z = 0; z < this.ChunksY; z++)
+            for (var y = 0; y < this.ChunksY; y++)
             {
-                var chunk = new GameObject();
-                
-                var renderer = chunk.AddComponent<MeshRenderer>();
-                renderer.material = this.Material;
+                for (var z = 0; z < this.ChunksZ; z++)
+                {
+                    var chunk = new GameObject();
 
-                var surfaceNets = chunk.AddComponent<SurfaceNets>();
+                    var renderer = chunk.AddComponent<MeshRenderer>();
+                    renderer.material = this.Material;
 
-                chunk.transform.parent = transform;
-                chunk.transform.position = new Vector3(x, 0, z) * 30;
+                    var surfaceNets = chunk.AddComponent<SurfaceNets>();
+
+                    chunk.transform.parent = transform;
+                    chunk.transform.position = new Vector3(x, y, z) * 30;
+                }
             }
         }
     }
