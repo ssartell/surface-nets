@@ -81,7 +81,7 @@ namespace Assets
 
         public Sdf Transform(Transform transform)
         {
-            return new Sdf(p => _sdf(transform.TransformVector(p)));
+            return new Sdf(p => _sdf(transform.TransformVector(p) + transform.localPosition));
         }
 
         public Sdf Negate()

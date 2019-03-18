@@ -6,9 +6,8 @@ using UnityEngine;
 
 public class SurfaceNets : MonoBehaviour
 {
-    public int Size = 50;
     private float _isoLevel = 0.0f;
-    private float _noiseScale = 5.0f;
+    private int _size = 32;
 
     private List<Edge> _edges;
     private List<int> _intersections;
@@ -19,33 +18,14 @@ public class SurfaceNets : MonoBehaviour
     private Voxel[,,] _voxels;
     private Func<Vector3, float> _sdf;
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(Vector3.one * Size / 2f, Vector3.one * Size);
-
-        for (var x = 0; x < Size - 1; x++)
-        {
-            for (var y = 0; y < Size - 1; y++)
-            {
-                for (var z = 0; z < Size - 1; z++)
-                {
-                    if (_cubes[x, y, z].IsOnSurface)
-                    {
-                        Gizmos.DrawWireCube(new Vector3(x + .5f, y + .5f, z + .5f), Vector3.one);
-                    }
-                }
-            }
-        }
-    }
-
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("starting surface nets");
         _corners = Corners();
         _edges = EdgesTable();
         _intersections = IntersectionsTable(_edges);
-
+        
         _sdf = Sdf.Intersection(
                 Sdf.Union(
                     Sdf.Plane(Vector3.up)
@@ -53,31 +33,35 @@ public class SurfaceNets : MonoBehaviour
                     Sdf.Sphere()
                         .Scale(8)
                         .Translate(Vector3.one * 16)),
-                Sdf.Perlin(this.Size / 5f))
+                Sdf.Perlin(this._size / 5f))
             .Transform(transform)
             .ToFunc();
 
         _voxels = GenerateVoxels(_sdf);
 
         GenerateMesh();
+
+        if (_vertices.Count > 65536)
+        {
+            Debug.LogWarning("Exceeded max vertex count of 65536 (2^16).");
+        }
+
+        var mesh = new Mesh
+        {
+            vertices = this._vertices.ToArray(),
+            triangles = this._triangles.ToArray()
+        };
+
+        mesh.RecalculateNormals();
+
+        gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
+        gameObject.AddComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(transform.localPosition.ToString());
-        _sdf = Sdf.Intersection(
-                Sdf.Union(
-                    Sdf.Plane(Vector3.up)
-                        .Translate(new Vector3(0, 16, 0)),
-                    Sdf.Sphere()
-                        .Scale(8)
-                        .Translate(Vector3.one * 16)),
-                Sdf.Perlin(this.Size / 5f))
-            .Transform(transform)
-            .ToFunc();
-        _voxels = GenerateVoxels(_sdf);
-        GenerateMesh();
+
     }
 
     private void GenerateMesh()
@@ -85,13 +69,13 @@ public class SurfaceNets : MonoBehaviour
         _vertices = new List<Vector3>();
         _triangles = new List<int>();
 
-        _cubes = GenerateCubes(Size, _isoLevel, _voxels);
+        _cubes = GenerateCubes(this._size, _isoLevel, _voxels);
 
-        for (var x = 0; x < Size - 1; x++)
+        for (var x = 0; x < this._size - 1; x++)
         {
-            for (var y = 0; y < Size - 1; y++)
+            for (var y = 0; y < this._size - 1; y++)
             {
-                for (var z = 0; z < Size - 1; z++)
+                for (var z = 0; z < this._size - 1; z++)
                 {
                     var cube = _cubes[x, y, z];
                     if (!cube.IsOnSurface) continue;
@@ -144,18 +128,6 @@ public class SurfaceNets : MonoBehaviour
             }
 
         }
-
-        var mesh = new Mesh();
-        this.GetComponent<MeshFilter>().mesh = mesh;
-
-        if (_vertices.Count > 65536)
-        {
-            Debug.LogWarning("Exceeded max vertex count of 65536 (2^16).");
-        }
-
-        mesh.vertices = _vertices.ToArray();
-        mesh.triangles = _triangles.ToArray();
-        mesh.RecalculateNormals();
     }
 
     private Cube[,,] GenerateCubes(int size, float isoLevel, Voxel[,,] voxels)
@@ -226,12 +198,12 @@ public class SurfaceNets : MonoBehaviour
 
     private Voxel[,,] GenerateVoxels(Func<Vector3, float> sdf)
     {
-        var voxels = new Voxel[Size, Size, Size];
-        for (var x = 0; x < Size; x++)
+        var voxels = new Voxel[this._size, this._size, this._size];
+        for (var x = 0; x < this._size; x++)
         {
-            for (var y = 0; y < Size; y++)
+            for (var y = 0; y < this._size; y++)
             {
-                for (var z = 0; z < Size; z++)
+                for (var z = 0; z < this._size; z++)
                 {
                     var p = new Vector3(x, y, z);
                     voxels[x, y, z] = new Voxel()
@@ -300,6 +272,29 @@ public class SurfaceNets : MonoBehaviour
             new Corner(0,1,1), 	// 6
             new Corner(1,1,1)  	// 7
         };
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireMesh(this.GetComponent<MeshFilter>().mesh, transform.localPosition);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(Vector3.one * this._size / 2f + transform.localPosition, transform.TransformVector(Vector3.one * this._size));
+
+        //for (var x = 0; x < Size - 1; x++)
+        //{
+        //    for (var y = 0; y < Size - 1; y++)
+        //    {
+        //        for (var z = 0; z < Size - 1; z++)
+        //        {
+        //            if (_cubes[x, y, z].IsOnSurface)
+        //            {
+        //                Gizmos.DrawWireCube(new Vector3(x + .5f, y + .5f, z + .5f), Vector3.one);
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
 
