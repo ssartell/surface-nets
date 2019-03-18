@@ -84,9 +84,34 @@ namespace Assets
             return new Sdf(p => _sdf(transform.TransformVector(p) + transform.localPosition));
         }
 
+        public Sdf Displace(Func<Vector3, float> displacement)
+        {
+            return new Sdf(p => _sdf(p) + displacement(p));
+        }
+
+        public Sdf Repeat(Vector3 c)
+        {
+            return new Sdf(p => _sdf(new Vector3(p.x % c.x, p.y % c.y, p.z % c.z) - .5f * c));
+        }
+
         public Sdf Negate()
         {
             return new Sdf(p => - _sdf(p));
+        }
+
+        public Sdf Apply(Func<float, float> func)
+        {
+            return new Sdf(p => func(_sdf(p)));
+        }
+
+        public static Sdf Add(Sdf sdf1, Sdf sdf2)
+        {
+            return new Sdf(p => sdf1.ToFunc()(p) + sdf2.ToFunc()(p));
+        }
+
+        public static Sdf Subtract(Sdf sdf1, Sdf sdf2)
+        {
+            return new Sdf(p => sdf1.ToFunc()(p) - sdf2.ToFunc()(p));
         }
 
         public static Sdf Union(Sdf sdf1, Sdf sdf2)
@@ -94,7 +119,7 @@ namespace Assets
             return new Sdf(p => Mathf.Min(sdf1.ToFunc()(p), sdf2.ToFunc()(p)));
         }
 
-        public static Sdf Subtract(Sdf sdf1, Sdf sdf2)
+        public static Sdf Difference(Sdf sdf1, Sdf sdf2)
         {
             return Intersection(sdf1.Negate(), sdf2);
         }
@@ -106,7 +131,7 @@ namespace Assets
 
         public Func<Vector3, float> ToFunc()
         {
-            return _sdf;
+            return p => Mathf.Clamp(_sdf(p), -1, 1);
         }
     }
 }

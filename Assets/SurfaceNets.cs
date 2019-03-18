@@ -25,7 +25,7 @@ public class SurfaceNets : MonoBehaviour
         _corners = Corners();
         _edges = EdgesTable();
         _intersections = IntersectionsTable(_edges);
-        
+
         // wormy plane
         //_sdf = Sdf.Intersection(
         //        Sdf.Union(
@@ -39,11 +39,17 @@ public class SurfaceNets : MonoBehaviour
         //    .ToFunc();
 
         // wormy sphere
-        _sdf = Sdf.Intersection(
-            Sdf.Sphere()
-                .Scale(70)
-                .Translate(Vector3.one * 80),
-            Sdf.Perlin(5))
+        //_sdf = Sdf.Intersection(
+        //    Sdf.Sphere()
+        //        .Scale(70)
+        //        .Translate(Vector3.one * 80),
+        //    Sdf.Perlin(5))
+        //    .Transform(transform)
+        //    .ToFunc();
+
+        _sdf = Sdf.Sphere()
+            .Scale(2)
+            .Repeat(Vector3.one * 5)
             .Transform(transform)
             .ToFunc();
 
@@ -286,8 +292,8 @@ public class SurfaceNets : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireMesh(this.GetComponent<MeshFilter>().mesh, transform.localPosition);
+        //Gizmos.color = Color.white;
+        //Gizmos.DrawWireMesh(this.GetComponent<MeshFilter>().mesh, transform.localPosition);
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(Vector3.one * this._size / 2f + transform.localPosition, transform.TransformVector(Vector3.one * this._size));
