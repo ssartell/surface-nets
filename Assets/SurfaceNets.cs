@@ -47,11 +47,23 @@ public class SurfaceNets : MonoBehaviour
         //    .Transform(transform)
         //    .ToFunc();
 
-        _sdf = Sdf.Sphere()
-            .Scale(2)
-            .Repeat(Vector3.one * 5)
+        // heart
+        //_sdf = Sdf.Sphere()
+        //    .Scale(15)
+        //    .Transform(p => new Vector3(
+        //        p.x, 
+        //        4 + 1.2f * p.y - Mathf.Abs(p.x) * Mathf.Sqrt((20 - Mathf.Abs(p.x)) / 20f), 
+        //        p.z * (2 - p.y / 15f)))
+        //    .Translate(Vector3.one * 20)
+        //    .Transform(transform)
+        //    .ToFunc();
+
+        _sdf = Sdf.Polygon(6)
+            .Extrude(1)
+            .Scale(10)
             .Transform(transform)
             .ToFunc();
+
 
         _voxels = GenerateVoxels(_sdf);
 

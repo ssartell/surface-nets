@@ -45,6 +45,18 @@ namespace Assets
             return new Sdf(p => Vector3.Dot(p, normal));
         }
 
+        public static Sdf Polygon(float n)
+        {
+            return new Sdf(p =>
+            {
+                var p0 = new Vector2(p.x, p.z);
+                var a = Mathf.Atan2(p0.y, p0.x);
+                var r = 2 * Mathf.PI / n;
+                var d = Mathf.Cos(Mathf.Floor(0.5f + a / r) * r - a) * p0.magnitude;
+                return d - 1f;
+            });
+        }
+
         public static Sdf Perlin(float scale)
         {
             return new Sdf(p =>
@@ -79,9 +91,39 @@ namespace Assets
             return new Sdf(p => _sdf(rotation * p));
         }
 
+        public Sdf Extrude(float height)
+        {
+            return new Sdf(p =>
+            {
+                var d = _sdf(p);
+                var w = new Vector2(d, Mathf.Abs(p.y) - height);
+                return Mathf.Min(Mathf.Max(w.x, w.y), 0) +
+                       (new Vector2(Mathf.Max(w.x, 0), Mathf.Max(w.y, 0))).magnitude;
+            });
+        }
+
+        public Sdf Revolve(float o)
+        {
+            return new Sdf(p =>
+            {
+                var q = new Vector3((new Vector2(p.x, p.z)).magnitude - o, 0, p.y);
+                return _sdf(q);
+            });
+        }
+
+        public Sdf Round(float radius)
+        {
+            return new Sdf(p => _sdf(p) - radius);
+        }
+
         public Sdf Transform(Transform transform)
         {
             return new Sdf(p => _sdf(transform.TransformVector(p) + transform.localPosition));
+        }
+
+        public Sdf Transform(Func<Vector3, Vector3> transform)
+        {
+            return new Sdf(p => _sdf(transform(p)));
         }
 
         public Sdf Displace(Func<Vector3, float> displacement)
