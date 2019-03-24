@@ -39,13 +39,12 @@ public class SurfaceNets : MonoBehaviour
         //    .ToFunc();
 
         // wormy sphere
-        //_sdf = Sdf.Intersection(
-        //    Sdf.Sphere()
-        //        .Scale(70)
-        //        .Translate(Vector3.one * 80),
-        //    Sdf.Perlin(5))
-        //    .Transform(transform)
-        //    .ToFunc();
+        _sdf = Sdf.Intersection(
+            Sdf.Sphere()
+                .Scale(40),
+            Sdf.Perlin(5))
+            .Transform(transform)
+            .ToFunc();
 
         // heart
         //_sdf = Sdf.Sphere()
@@ -57,12 +56,6 @@ public class SurfaceNets : MonoBehaviour
         //    .Translate(Vector3.one * 20)
         //    .Transform(transform)
         //    .ToFunc();
-
-        _sdf = Sdf.Polygon(6)
-            .Extrude(1)
-            .Scale(10)
-            .Transform(transform)
-            .ToFunc();
 
 
         _voxels = GenerateVoxels(_sdf);
@@ -97,13 +90,14 @@ public class SurfaceNets : MonoBehaviour
         _vertices = new List<Vector3>();
         _triangles = new List<int>();
 
-        _cubes = GenerateCubes(this._size, _isoLevel, _voxels);
+        _cubes = GenerateCubes(_isoLevel, _voxels);
+        var size = _cubes.GetLength(0);
 
-        for (var x = 0; x < this._size - 1; x++)
+        for (var x = 1; x < size; x++)
         {
-            for (var y = 0; y < this._size - 1; y++)
+            for (var y = 1; y < size; y++)
             {
-                for (var z = 0; z < this._size - 1; z++)
+                for (var z = 1; z < size; z++)
                 {
                     var cube = _cubes[x, y, z];
                     if (!cube.IsOnSurface) continue;
@@ -117,7 +111,6 @@ public class SurfaceNets : MonoBehaviour
                         var v3 = 0;
                         if (i == 0)
                         {
-                            if (y - 1 < 0 || z - 1 < 0) continue;
                             v0 = cube.VertexIndex;
                             v1 = _cubes[x, y - 1, z].VertexIndex;
                             v2 = _cubes[x, y - 1, z - 1].VertexIndex;
@@ -125,7 +118,6 @@ public class SurfaceNets : MonoBehaviour
                         }
                         else if (i == 1)
                         {
-                            if (x - 1 < 0 || y - 1 < 0) continue;
                             v0 = cube.VertexIndex;
                             v1 = _cubes[x - 1, y, z].VertexIndex;
                             v2 = _cubes[x - 1, y - 1, z].VertexIndex;
@@ -133,7 +125,6 @@ public class SurfaceNets : MonoBehaviour
                         }
                         else if (i == 2)
                         {
-                            if (x - 1 < 0 || z - 1 < 0) continue;
                             v0 = cube.VertexIndex;
                             v1 = _cubes[x, y, z - 1].VertexIndex;
                             v2 = _cubes[x - 1, y, z - 1].VertexIndex;
@@ -158,15 +149,16 @@ public class SurfaceNets : MonoBehaviour
         }
     }
 
-    private Cube[,,] GenerateCubes(int size, float isoLevel, Voxel[,,] voxels)
+    private Cube[,,] GenerateCubes(float isoLevel, Voxel[,,] voxels)
     {
         var vertexIndex = 0;
-        var cubes = new Cube[size - 1, size - 1, size - 1];
-        for (var x = 0; x < size - 1; x++)
+        var size = voxels.GetLength(0) - 1;
+        var cubes = new Cube[size, size, size];
+        for (var x = 0; x < size; x++)
         {
-            for (var y = 0; y < size - 1; y++)
+            for (var y = 0; y < size; y++)
             {
-                for (var z = 0; z < size - 1; z++)
+                for (var z = 0; z < size; z++)
                 {
                     var cornerVoxels = new Voxel[8];
                     var cornerMask = 0;
@@ -226,6 +218,7 @@ public class SurfaceNets : MonoBehaviour
 
     private Voxel[,,] GenerateVoxels(Func<Vector3, float> sdf)
     {
+
         var voxels = new Voxel[this._size, this._size, this._size];
         for (var x = 0; x < this._size; x++)
         {
@@ -308,17 +301,17 @@ public class SurfaceNets : MonoBehaviour
         //Gizmos.DrawWireMesh(this.GetComponent<MeshFilter>().mesh, transform.localPosition);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(Vector3.one * this._size / 2f + transform.localPosition, transform.TransformVector(Vector3.one * this._size));
+        Gizmos.DrawWireCube(Vector3.one * (this._size - 1) / 2f + transform.localPosition, transform.TransformVector(Vector3.one * (this._size - 1)));
 
-        //for (var x = 0; x < Size - 1; x++)
+        //for (var x = 0; x < _size - 1; x++)
         //{
-        //    for (var y = 0; y < Size - 1; y++)
+        //    for (var y = 0; y < _size - 1; y++)
         //    {
-        //        for (var z = 0; z < Size - 1; z++)
+        //        for (var z = 0; z < _size - 1; z++)
         //        {
         //            if (_cubes[x, y, z].IsOnSurface)
         //            {
-        //                Gizmos.DrawWireCube(new Vector3(x + .5f, y + .5f, z + .5f), Vector3.one);
+        //                Gizmos.DrawWireCube(new Vector3(x + .5f, y + .5f, z + .5f) + transform.localPosition, Vector3.one);
         //            }
         //        }
         //    }

@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
-    public int ChunksX = 3;
+    public int ChunksX = 1;
     public int ChunksY = 1;
-    public int ChunksZ = 3;
+    public int ChunksZ = 1;
 
     public int ChunkSize = 32;
 
@@ -15,7 +15,7 @@ public class ChunkManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var size = (this.ChunkSize - 2);
+        var size = this.ChunkSize - 1;  // chunks should overlap by one voxel
         var offset = new Vector3(this.ChunksX, this.ChunksY, this.ChunksZ) * size / 2f;
         for (var x = 0; x < this.ChunksX; x++)
         {
