@@ -214,6 +214,8 @@ MonoBehaviour:
   ChunksY: 3
   ChunksZ: 3
   ChunkSize: 32
+  Lod: 1
+  IsoLevel: 0
   Material: {fileID: 2100000, guid: f62ce3b2755e48344aeb32ce9d63265a, type: 2}
 --- !u!4 &223226498
 Transform:
